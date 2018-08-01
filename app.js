@@ -3,9 +3,8 @@
 const ipfs = window.IpfsApi('ipfs.infura.io', '5001', {protocol: 'https'})
 const Buffer = window.IpfsApi().Buffer
 
-function store () {
-  var toStore = document.getElementById('source').value
-  ipfs.add(new Buffer(toStore), function (err, res) {
+function saveToIpfs (reader) {
+  ipfs.add(Buffer.from(reader.result), function (err, res) {
     if (err || !res) {
       return console.error('ipfs add error', err, res)
     }
@@ -14,6 +13,13 @@ function store () {
       display(file.hash)
     })
   })
+}
+
+function store () {
+  var toStore = document.getElementById('source').files[0]
+  let reader = new window.FileReader()
+  reader.onloadend = () => saveToIpfs(reader)
+  reader.readAsArrayBuffer(toStore)
 }
 
 function display (hash) {
